@@ -1,0 +1,30 @@
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\bin\x86\Debug\EEG_Example_1.exe
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\bin\x86\Debug\EEG_Example_1.pdb
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\bin\x86\Debug\DotNetEmotivSDK.dll
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\bin\x86\Debug\DotNetEmotivSDK.pdb
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\build\Debug\EEG_Example_1.exe
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\build\Debug\EEG_Example_1.pdb
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\build\Debug\EEG_Example_1.exe
+C:\Program Files\Emotiv Development Kit_v1.0.0.2-PREMIUM\doc\examples_DotNet\build\Debug\EEG_Example_1.pdb
+D:\tien\trunk\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+D:\tien\trunk\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb
+D:\tien\trunk\doc\examples_DotNet_primary1\examples_DotNet\build\Debug\EEG_Example_1.exe
+D:\tien\trunk\doc\examples_DotNet_primary1\examples_DotNet\build\Debug\EEG_Example_1.pdb
+D:\tien\trunk\doc\examples_DotNet_primary1\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\tien\trunk\doc\examples_DotNet_primary1\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+D:\tien\trunk\doc\examples_DotNet_primary1\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb
+D:\tien\bEDK-NotSecurity\doc\examples_DotNet_primary1\examples_DotNet\build\Debug\EEG_Example_1.exe
+D:\tien\bEDK-NotSecurity\doc\examples_DotNet_primary1\examples_DotNet\build\Debug\EEG_Example_1.pdb
+D:\tien\bEDK-NotSecurity\doc\examples_DotNet_primary1\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\tien\bEDK-NotSecurity\doc\examples_DotNet_primary1\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+D:\tien\bEDK-NotSecurity\doc\examples_DotNet_primary1\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb
+C:\Program Files (x86)\Emotiv Research Edition SDK_v1.0.0.5-PREMIUM\doc\examples_DotNet\build\Debug\EEG_Example_1.exe
+C:\Program Files (x86)\Emotiv Research Edition SDK_v1.0.0.5-PREMIUM\doc\examples_DotNet\build\Debug\EEG_Example_1.pdb
+C:\Program Files (x86)\Emotiv Research Edition SDK_v1.0.0.5-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Program Files (x86)\Emotiv Research Edition SDK_v1.0.0.5-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+C:\Program Files (x86)\Emotiv Research Edition SDK_v1.0.0.5-PREMIUM\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb

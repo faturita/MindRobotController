@@ -1,0 +1,14 @@
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\MindRobotController.exe
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\MindRobotController.pdb
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\EEGLogger.exe
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\Exocortex.DSP.v1.dll
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\DotNetEmotivSDK.dll
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\Exocortex.DSP.v1.pdb
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\EEGLogger.pdb
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\bin\Debug\DotNetEmotivSDK.pdb
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\obj\Debug\MindRobotController.Form1.resources
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\obj\Debug\MindRobotController.Properties.Resources.resources
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\obj\Debug\MindRobotController.csproj.GenerateResource.Cache
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\obj\Debug\MindRobotController.exe
+C:\Users\User\Google Drive\MindRobotController\MindRobotController\obj\Debug\MindRobotController.pdb

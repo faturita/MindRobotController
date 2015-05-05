@@ -1,0 +1,9 @@
+C:\Users\User\Google Drive\MindRobotController\build\Debug\DotNetEmotivSDK.dll
+C:\Users\User\Google Drive\MindRobotController\build\Debug\DotNetEmotivSDK.pdb
+C:\Users\User\Google Drive\MindRobotController\DotNetEmotivSDK\DotNetEmotivSDK\Debug\ResolveAssemblyReference.cache
+C:\Users\User\Google Drive\MindRobotController\DotNetEmotivSDK\DotNetEmotivSDK\Debug\DotNetEmotivSDK.dll
+C:\Users\User\Google Drive\MindRobotController\DotNetEmotivSDK\DotNetEmotivSDK\Debug\DotNetEmotivSDK.pdb
+D:\newworkspace\MindRobotController\build\Debug\DotNetEmotivSDK.dll
+D:\newworkspace\MindRobotController\build\Debug\DotNetEmotivSDK.pdb
+D:\newworkspace\MindRobotController\DotNetEmotivSDK\DotNetEmotivSDK\Debug\DotNetEmotivSDK.dll
+D:\newworkspace\MindRobotController\DotNetEmotivSDK\DotNetEmotivSDK\Debug\DotNetEmotivSDK.pdb

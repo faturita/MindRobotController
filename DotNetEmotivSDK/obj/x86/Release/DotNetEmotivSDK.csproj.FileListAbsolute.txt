@@ -1,0 +1,15 @@
+D:\tien\trunk\doc\examples_DotNet\build\Release\DotNetEmotivSDK.dll
+D:\tien\trunk\doc\examples_DotNet\build\Release\DotNetEmotivSDK.pdb
+D:\tien\trunk\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\ResolveAssemblyReference.cache
+D:\tien\trunk\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\DotNetEmotivSDK.dll
+D:\tien\trunk\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\DotNetEmotivSDK.pdb
+D:\tien\bEDK\trunk\doc\examples_DotNet\build\Release\DotNetEmotivSDK.dll
+D:\tien\bEDK\trunk\doc\examples_DotNet\build\Release\DotNetEmotivSDK.pdb
+D:\tien\bEDK\trunk\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\ResolveAssemblyReference.cache
+D:\tien\bEDK\trunk\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\DotNetEmotivSDK.dll
+D:\tien\bEDK\trunk\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\DotNetEmotivSDK.pdb
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\build\Release\DotNetEmotivSDK.dll
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\build\Release\DotNetEmotivSDK.pdb
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\ResolveAssemblyReference.cache
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\DotNetEmotivSDK.dll
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\DotNetEmotivSDK\obj\x86\Release\DotNetEmotivSDK.pdb

@@ -1,0 +1,12 @@
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\build\Debug\EEG_Example_1.exe
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\build\Debug\EEG_Example_1.pdb
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.exe
+C:\Users\User\Desktop\Emotiv\asdfasdf\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEG_Example_1.pdb
+C:\Users\User\Desktop\Emotiv\VisualAttention\VisualSpatialCovertAttention\build\Debug\EEGLogger.exe
+C:\Users\User\Desktop\Emotiv\VisualAttention\VisualSpatialCovertAttention\build\Debug\EEGLogger.pdb
+C:\Users\User\Desktop\Emotiv\VisualAttention\VisualSpatialCovertAttention\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\User\Desktop\Emotiv\VisualAttention\VisualSpatialCovertAttention\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEGLogger.exe
+C:\Users\User\Desktop\Emotiv\VisualAttention\VisualSpatialCovertAttention\DotNet_EEG_Example\EEG_Example_1\obj\x86\Debug\EEGLogger.pdb
+D:\newworkspace\build\Debug\EEGLogger.exe
+D:\newworkspace\build\Debug\EEGLogger.pdb

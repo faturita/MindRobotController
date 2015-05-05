@@ -1,0 +1,14 @@
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\bin\Debug\EEGLogger.exe
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\bin\Debug\EEGLogger.pdb
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\bin\Debug\DotNetEmotivSDK.dll
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\bin\Debug\DotNetEmotivSDK.pdb
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\obj\Debug\EEGLogger.exe
+C:\Users\User\Google Drive\MindRobotController\EEGLogger\obj\Debug\EEGLogger.pdb
+D:\newworkspace\MindRobotController\EEGLogger\bin\Debug\EEGLogger.exe
+D:\newworkspace\MindRobotController\EEGLogger\bin\Debug\EEGLogger.pdb
+D:\newworkspace\MindRobotController\EEGLogger\bin\Debug\DotNetEmotivSDK.dll
+D:\newworkspace\MindRobotController\EEGLogger\bin\Debug\DotNetEmotivSDK.pdb
+D:\newworkspace\MindRobotController\EEGLogger\obj\Debug\EGGLogger.csprojResolveAssemblyReference.cache
+D:\newworkspace\MindRobotController\EEGLogger\obj\Debug\EEGLogger.exe
+D:\newworkspace\MindRobotController\EEGLogger\obj\Debug\EEGLogger.pdb

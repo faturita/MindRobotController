@@ -1,0 +1,5 @@
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\build\Release\EEG_Example_1.exe
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\build\Release\EEG_Example_1.pdb
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Release\ResolveAssemblyReference.cache
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Release\EEG_Example_1.exe
+D:\Emotiv\codes\bEDK-NotSecurity-new\doc\examples_DotNet\DotNet_EEG_Example\EEG_Example_1\obj\x86\Release\EEG_Example_1.pdb
