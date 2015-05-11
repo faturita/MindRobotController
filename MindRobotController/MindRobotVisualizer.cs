@@ -12,42 +12,35 @@ using System.Net.Sockets;
 using EEGLogger;
 using Exocortex.DSP;
 using System.Net;
+using System.Diagnostics;
 
 namespace MindRobotController
 {
     public partial class MindRobotVisualizer : Form, TickReceiver
     {
-        EEGDataTickGenerator t;
+        EEGDataTickGenerator eegtickgen;
 
-        PortController p;
+        PortController portcontroller = new PortController();
 
         public MindRobotVisualizer()
         {
             InitializeComponent();
 
-            PortController.enabled = false;
+            portcontroller.enabled = false;
 
-            PortController.Init();
+            fft[0] = new double[WINDOWSIZE];
+            fft[1] = new double[WINDOWSIZE];
 
-            PortController.Command("T,1");
+            fs[0] = new double[WINDOWSIZE];
+            fs[1] = new double[WINDOWSIZE];
 
-            PortController.Command("T,1");
+            threshold[0] = new Threshold();
+            threshold[1] = new Threshold();
 
-            window[0] = new ComplexF[128];
-            window[1] = new ComplexF[128];
 
-            fft[0] = new ComplexF[128];
-            fft[1] = new ComplexF[128];
+            System.Windows.Forms.MessageBox.Show("1-Start this app.\r\n2-Start the ArDrone Server\r\n3-Start the Emergency Line\r\n4-Do Network Check\r\n5-Do Land Check");
 
         }
-
-        [DllImportAttribute("User32.dll")]
-
-        private static extern int FindWindow(String ClassName, String
-        WindowName);
-
-        [DllImportAttribute("User32.dll")]
-        private static extern int SetForegroundWindow(int hWnd);
 
         Random r = new Random();
 
@@ -71,25 +64,49 @@ namespace MindRobotController
 
         float[] psd = new float[2];
 
+
+        private bool calibrating = true;
+
+        public void SignalStart()
+        {
+
+            try { portcontroller.Init(); }
+            catch (System.IO.IOException e) { portcontroller.enabled = false; }
+
+            portcontroller.Beep();
+
+            //t = new PlainTickGenerator();
+            Experiment experiment = new Experiment();
+            experiment.datadirectory = "C:\\Users\\User\\Desktop\\RobotMindController\\";
+
+            eegtickgen = new EEGDataTickGenerator(experiment, textBox1.Text);
+
+            eegtickgen.SetStopTimer(4);
+
+            eegtickgen.StartEvent();
+            eegtickgen.Start(this);
+
+        }
+
+
         public void SignalStop()
 
         {
             Console.WriteLine("Closing epuck port....");
-            PortController.Command("S");
-            PortController.Terminate();
+
+            portcontroller.Stop();
+
+            portcontroller.Terminate();
         
         }
 
-        // 1 second window
 
-        ComplexF[][] window = new ComplexF[14][];
-        ComplexF[][] fft = new ComplexF[14][];
-
-
-        double avg = 0;
-
-
-
+        /**
+         * Useme to communicate this program to another device.
+         * 
+         * This will send a UDP commando to the specified host:port which is MATLAB
+         * 
+         **/ 
         public void SendPlot(string plot)
         {
             UdpClient udpClient = new UdpClient("localhost", 7788);
@@ -105,239 +122,346 @@ namespace MindRobotController
         }
 
 
+        /**
+         * Useme to communicate this program to another device.
+         * 
+         * This will send a UDP commando to the specified host:port.
+         * 
+         **/
+        public void SendCommand(string message)
+        {
+            //UdpClient udpClient = new UdpClient("10.6.0.155", 7778);
+            UdpClient udpClient = new UdpClient(ipTextBox.Text, 7778);
+            Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
+            try
+            {
+                //Console.WriteLine("Sending Command:" + message);
+                udpClient.Send(sendBytes, sendBytes.Length);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+
+        private int maxSpeed = 9210;
+        private int minSpeed = -11970;
+
+        private int minBalance = -13640;
+        private int maxBalance = 16000;
+
         public void tick()
         {
             if (!this.IsDisposed)
             {
-
-                    samples++;
-
-                    float result = 1;
-                    if (float.TryParse(textBox7.Text, out result))
-                        sensibility = result;
-
-                    int newwx = (int)(t.gyrox);
-                    int newwy = (int)(t.gyroy);
-
-                    // Leaky integrator.
-                    //newx = (int)((0.5 * (float)newx + (1 - 0.5) * (float)newwx));
-                    //newy = (int)((0.5 * (float)newy + (1 - 0.5) * (float)newwy));
-
-                    newx = newwx;
-                    newy = newwy;
+                ControlDrone();
 
 
-                    for(int c=0;c<2;c++)
-                    {
-                        if (samples % 128 == 0 )
-                        {
+                /**
+                samples++;
 
-                            /**
-                            for (int d = 0; d < 128; d++)
-                            {
-                                window[c][d].Re = (float)(10 * Math.Sin(2 * Math.PI * (8F/128F) * d));
-                                window[c][d].Re += (float)(7 * Math.Sin(2 * Math.PI * (15F / 128F) * d));
-                            }**/
+                int newwx = (int)(eegtickgen.gyrox);
+                int newwy = (int)(eegtickgen.gyroy);
 
+                doFFT();
 
-                            ComplexF[] temp = new ComplexF[128];
-
-                            Array.Copy(window[c], temp, 128);
-
-
-                            Fourier.FFT(temp, 128, FourierDirection.Forward);
-
-                            Array.Copy(temp, fft[c], 128);
-
-
-
-
-                            /**
-                            for (int d = 0; d < 128; d++)
-                            {
-                                if (((d < 16 || d > 32) && d < 64) ||
-                                ((d < 128 - 32 || d > 128 - 16) && d > 64))
-                                {
-                                    fft[c][d].Im = 0;
-                                }
-                            }**/
-
-
-                            /**
-                            float numBins = 128 / 2;  // Half the length of the FFT by symmetry
-                            float binWidth = 128 / numBins; // Hz
-
-                            float DCGain=1.0F;
-                            float order = 3;
-                            float f0 = 45;
-
-
-                            // Filter
-                            for(int i=0;i<128/2;i++)
-                            {
-                                float binFreq = binWidth * i;
-                                float gain = (float)(DCGain / ( Math.Sqrt( ( 1 + 
-                                Math.Pow( binFreq / f0, 2.0 * order ) ) ) ));
-                                window[c][i].Re *= gain; window[c][i].Im *= gain;
-                                window[c][128 - i].Re *= gain; window[c][128 - i].Im *= gain;
-                            }
-
-
-                            f0 = 72;
-                            for (int i = 0; i < 128 / 2; i++)
-                            {
-                                float binFreq = binWidth * i;
-                                float gain = (float)(DCGain / (Math.Sqrt((1 +
-                                Math.Pow(binFreq / f0, 2.0 * order)))));
-                                window[c][i].Re *= gain; window[c][i].Im *= gain;
-                                window[c][128 - i].Re *= gain; window[c][128 - i].Im *= gain;
-                            }**/
-
-
-
-                            StringBuilder strb = new StringBuilder();
-
-                            strb.Append("fftsignal = [");
-                            for (int i = 0; i < 128; i++)
-                            {
-                                float val = fft[c][i].Im;
-
-                                val = Math.Abs(val);
-                                strb.Append(" " + val + " ");
-
-                                fft[c][i].Im = val;
-                            }
-
-                            strb.Append("];");
-
-                            SendPlot(strb.ToString());
-
-                            psd[c] = GetPSD(c,15,25);
-
-                            window[c] = new ComplexF[128];
-                        }
-                        else
-                        {
-                            ComplexF timepoint = new ComplexF();
-                            timepoint.Im = 0;
-
-                            switch (c) 
-                            {
-                                case 0: 
-                                    timepoint.Re = (float)t.o1;
-                                    break;
-                                case 1:
-                                    timepoint.Re = (float)t.o2;
-                                    break;
-                                default:break;
-                            }
-
-
-                            window[c][samples % 128] = timepoint;
-                        }
-                    }
-
-
-                    //avgx += newx;
-                    //avgy += newy;
-
-                    this.Invoke(new Blink(blink), new object[] { });
-
-                    changex = (int)(((newx) - avgx) * (-1) * sensibility);
-                    changey = (int)((newy - avgy) * sensibility);
-
-                    refractory++;
-
-                    if (((Math.Abs(changex) > 5 || Math.Abs(changey) > 5)))  // 100,40
-                    {
-                        balance += changex*10;
-                        speed -= changey*10;
-
-
-                        int wheelright = 200 + speed - balance;
-                        int wheelleft = 200 + speed + balance;
-
-                        int max = 800;
-
-                        if (wheelright > max) wheelright = max; if (wheelright < -max) wheelright = -max;
-                        if (wheelleft > max) wheelleft = max; if (wheelleft < -max) wheelleft = -max;
-
-                        PortController.Command("D," + wheelleft + "," + wheelright);
-
-                        ControlMinecraft();
-
-                        /**
-                        if (changey < 0)
-                        {
-                            PortController.Command("T,3");
-                            PortController.Command("D,100,100");
-                        }
-                        else if (changey > 0)
-                        {
-                            PortController.Command("T,5");
-                            PortController.Command("S");
-                        } else
-
-                        if (changex < 0) // Right
-                        {
-                            PortController.Command("T,1");
-                            PortController.Command("D,100,-100");
-                        }
-                        if (changex > 0)
-                        {
-                            PortController.Command("T,2");
-                            PortController.Command("D,100,-100");
-                        } **/
-
-                        //(GetPSD(1, 16, 32) / ((32 - 16)))
-
-                        avg += (GetPSD(0, 8, 15) / (15 - 8));
-
-                        
-                        if (samples > 600 && (GetPSD(0, 8, 15) / (15 - 8)) > (avg / samples * 1.5))
-                        {
-                            PortController.Command("b,1");
-                            PortController.Command("T,5");
-                            speed = (int) (speed*1.1);
-                        }
-
-
-
-                        if ((GetPSD(0, 8, 15) / ((15 - 8) * GetPSD(0, 0, 64))) > (GetPSD(1, 8, 15) / ((15 - 8) * GetPSD(1, 0, 64)))*1.5)
-                        {
-                            PortController.Command("f,1");
-                            PortController.Command("T,1");
-                        }
-                        else if ((GetPSD(1, 8, 15) / ((15 - 8) * GetPSD(1, 0, 64))) > (GetPSD(0, 8, 15) / ((15 - 8) * GetPSD(0, 0, 64))) * 1.5)
-                        {
-                            PortController.Command("f,0");
-                            PortController.Command("T,2");
-                        }
-
-
-
-                        refractory = 0;
-
-                    }
-                    else
-                    {
-                        PortController.Command("S");
-                        balance = speed = 0;
-                    }
-
+                this.Invoke(new Blink(blink), new object[] { });**/
 
             }
         }
 
-        private float GetPSD(int c, int minRange, int maxRange)
+        #region Controllers
+        private void ControlDrone()
         {
-            float tot = 0;
+            samples++;
+
+            float result = 1;
+            if (float.TryParse(textBox7.Text, out result))
+                sensibility = result;
+
+            int newwx = (int)(eegtickgen.gyrox);
+            int newwy = (int)(eegtickgen.gyroy);
+
+            newx = newwx;
+            newy = newwy;
+
+            this.Invoke(new Blink(blink), new object[] { });
+
+            changex = (int)((((float)newx) - (float)avgx) * (-1) * sensibility);
+            changey = (int)(((float)newy - (float)avgy) * sensibility);
+
+            refractory++;
+
+            doFFT();
+
+            if (((Math.Abs(changex) > 100 || Math.Abs(changey) > 40)))  // 100,40
+            {
+                balance += changex * 10;
+                speed -= changey * 10;
+
+                // Balance > 0 --> RIGTH
+                // SPEED > 0 --> FORWARD
+
+
+                int wheelright = 200 + speed - balance;
+                int wheelleft = 200 + speed + balance;
+
+                int max = 800;
+
+                if (wheelright > max) wheelright = max; if (wheelright < -max) wheelright = -max;
+                if (wheelleft > max) wheelleft = max; if (wheelleft < -max) wheelleft = -max;
+
+                portcontroller.SetWheels(wheelleft, wheelright);
+
+                //SendCommand("D," + wheelleft + "," + wheelright);
+
+                if (speed > maxSpeed) maxSpeed = speed;
+                if (speed < minSpeed) minSpeed = speed;
+
+                //Console.WriteLine("[" + minSpeed + "," + maxSpeed + "]");
+
+                if (balance > maxBalance) maxBalance = balance;
+                if (balance < minBalance) minBalance = balance;
+
+                //Console.WriteLine("[" + minBalance + "," + maxBalance + "]");
+
+                speed = linealdynamicrange(speed, minSpeed, maxSpeed, -max, max);
+                balance = linealdynamicrange(balance, minBalance, maxBalance, -max, max);
+
+                // Just be sure that no value goes beyond the threshold.
+                speed = rescale(speed, -max, max);
+                balance = rescale(balance, -max, max);
+
+                float MAXVALUE = 0.7F;
+
+                double fspeed = speed * MAXVALUE / max;
+                double fbalance = balance * MAXVALUE / max;
+
+                SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(fspeed) + ", \"balance\":" + FormatNumber(fbalance) + "}");
+
+                //doSomeNoise();
+
+                refractory = 0;
+
+            }
+            else
+            {
+                portcontroller.Stop();
+
+                if (samples % 128 ==0) SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+                
+                balance = speed = 0;
+            }
+        }
+        #endregion 
+
+        const int WINDOWSIZE = 1024;
+
+        double[][] fs = new double[2][];
+        double[][] fft = new double[2][];
+
+        Threshold[] threshold = new Threshold[2];
+
+        bool dofire = true;
+
+        private void doFFT()
+        {
+            fs[0][samples % WINDOWSIZE] = eegtickgen.o1;
+            fs[1][samples % WINDOWSIZE] = eegtickgen.o2;
+
+            // Skip the first shots.  Thery are noisier.
+            if (samples > WINDOWSIZE*3 && samples % WINDOWSIZE == 0)
+            {
+
+                for (int c = 0; c < 2; c++)
+                {
+
+                    fft[c] = GetFFT(fs[c]);
+
+                    if (calibrating)
+                    {
+                        threshold[c].calibrate(GetPSD(fft[c], 30, 34));
+                    }
+                    else
+                    if (dofire && threshold[c].votebellow(GetPSD(fft[c], 30, 34)))
+                    {
+                        dofire = false;
+                        Console.WriteLine("Vote!!!!!");
+                        SendCommand("{ \"status\":\"T\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+                    } 
+
+                    // USAME Para mandar esto a Matlab
+                    //SendFFT2(s, 2);
+                    //SendFFT2(fft[0], WINDOWSIZE/2);
+                }
+            }
+        }
+
+        private void SendFFT2(double[] fs, int size)
+        {
+            StringBuilder strb = new StringBuilder();
+
+            strb.Append("fftsignal = [");
+            for (int i = 0; i < size; i++)
+            {
+                double val = fs[i];
+
+                //val = Math.Abs(val);
+                strb.Append(" " + String.Format(new System.Globalization.CultureInfo("en-GB"),"{0:00000.0000000}", val) + " ");
+            }
+
+            strb.Append("];");
+
+            SendPlot(strb.ToString());
+        }
+
+        //private void ddoFFT()
+        //{
+        //    for (int c = 0; c < 2; c++)
+        //    {
+        //        if (samples % 128 == 0)
+        //        {
+
+        //            /**
+        //            for (int d = 0; d < 128; d++)
+        //            {
+        //                window[c][d].Re = (float)(10 * Math.Sin(2 * Math.PI * (8F/128F) * d));
+        //                window[c][d].Re += (float)(7 * Math.Sin(2 * Math.PI * (15F / 128F) * d));
+        //            }**/
+
+
+        //            ComplexF[] temp = new ComplexF[128];
+
+        //            Array.Copy(window[c], temp, 128);
+
+
+        //            Fourier.FFT(temp, 128, FourierDirection.Forward);
+
+        //            Array.Copy(temp, fft[c], 128);
+
+
+
+
+        //            /**
+        //            for (int d = 0; d < 128; d++)
+        //            {
+        //                if (((d < 16 || d > 32) && d < 64) ||
+        //                ((d < 128 - 32 || d > 128 - 16) && d > 64))
+        //                {
+        //                    fft[c][d].Im = 0;
+        //                }
+        //            }**/
+
+
+        //            /**
+        //            float numBins = 128 / 2;  // Half the length of the FFT by symmetry
+        //            float binWidth = 128 / numBins; // Hz
+
+        //            float DCGain=1.0F;
+        //            float order = 3;
+        //            float f0 = 45;
+
+
+        //            // Filter
+        //            for(int i=0;i<128/2;i++)
+        //            {
+        //                float binFreq = binWidth * i;
+        //                float gain = (float)(DCGain / ( Math.Sqrt( ( 1 + 
+        //                Math.Pow( binFreq / f0, 2.0 * order ) ) ) ));
+        //                window[c][i].Re *= gain; window[c][i].Im *= gain;
+        //                window[c][128 - i].Re *= gain; window[c][128 - i].Im *= gain;
+        //            }
+
+
+        //            f0 = 72;
+        //            for (int i = 0; i < 128 / 2; i++)
+        //            {
+        //                float binFreq = binWidth * i;
+        //                float gain = (float)(DCGain / (Math.Sqrt((1 +
+        //                Math.Pow(binFreq / f0, 2.0 * order)))));
+        //                window[c][i].Re *= gain; window[c][i].Im *= gain;
+        //                window[c][128 - i].Re *= gain; window[c][128 - i].Im *= gain;
+        //            }**/
+
+        //            SendFFT(c);
+
+        //            psd[c] = GetPSD(c, 15, 25);
+
+        //            // Reset the window
+        //            window[c] = new ComplexF[128];
+        //        }
+        //        else
+        //        {
+        //            ComplexF timepoint = new ComplexF();
+        //            timepoint.Im = 0;
+
+        //            switch (c)
+        //            {
+        //                case 0:
+        //                    timepoint.Re = (float)eegtickgen.o1;
+        //                    break;
+        //                case 1:
+        //                    timepoint.Re = (float)eegtickgen.o2;
+        //                    break;
+        //                default: break;
+        //            }
+
+
+        //            window[c][samples % 128] = timepoint;
+        //        }
+        //    }
+        //}
+
+        //private void SendFFT(int c)
+        //{
+        //    StringBuilder strb = new StringBuilder();
+
+        //    strb.Append("fftsignal = [");
+        //    for (int i = 0; i < 128; i++)
+        //    {
+        //        float val = fft[c][i].Im;
+
+        //        val = window[c][i].Re;
+
+        //        val = Math.Abs(val);
+        //        strb.Append(" " + val + " ");
+
+        //        fft[c][i].Im = val;
+        //    }
+
+        //    strb.Append("];");
+
+        //    SendPlot(strb.ToString());
+        //}
+
+
+        private double[] GetFFT(double[] thisfs)
+        {
+            double[] thisfft = new double[WINDOWSIZE];
+
+            ComplexF[] temp = new ComplexF[WINDOWSIZE];
+
+            for (int i = 0; i < WINDOWSIZE; i++) temp[i].Re = (float)thisfs[i];
+
+            Fourier.FFT(temp, WINDOWSIZE, FourierDirection.Forward);
+
+            for (int i = 0; i < WINDOWSIZE / 2; i++) thisfft[i] = Math.Abs((double)temp[i].Im);
+
+            return thisfft;
+        }
+
+        private double GetPSD(double []fft, int minRange, int maxRange)
+        {
+            double tot = 0;
             for (int i = minRange; i < maxRange; i++)
             {
-                tot += fft[c][i].Im;
+                tot += fft[i];
             }
             return tot;
         }
+
+        #region Minecraft
 
         public void ticdk()
         {
@@ -376,8 +500,8 @@ namespace MindRobotController
                     if (float.TryParse(textBox7.Text, out result))
                         sensibility = result;
 
-                    int newwx = (int)(t.gyrox);
-                    int newwy = (int)(t.gyroy);
+                    int newwx = (int)(eegtickgen.gyrox);
+                    int newwy = (int)(eegtickgen.gyroy);
 
                     // Leaky integrator.
                     //newx = (int)((0.5 * (float)newx + (1 - 0.5) * (float)newwx));
@@ -428,7 +552,7 @@ namespace MindRobotController
                     counter++;
                     Thread.Sleep(50);
 
-                    if (counter > 1000) t.Stop(); ;
+                    if (counter > 1000) eegtickgen.Stop(); ;
                 }
                 else
                 {
@@ -442,7 +566,6 @@ namespace MindRobotController
 
             }
         }
-
         public delegate void DoCommand(string command);
 
         public void doCommand(string command)
@@ -450,100 +573,14 @@ namespace MindRobotController
             SendKeys.Send(command);
         }
 
-        public delegate void Blink();
-
-
-
-
-        public void blink()
-        {
-            textBox2.Text = avgx.ToString();
-            textBox3.Text = avgy.ToString();
-            
-            textBox2.Text = speed.ToString();
-            textBox3.Text = balance.ToString();
-
-
-
-            textBox4.Text = samples.ToString();
-
-            psdO1.Text = (GetPSD(0, 16, 32)/((32-16) )).ToString();
-            psdO2.Text = (GetPSD(1, 16, 32) / ((32 - 16))).ToString();
-
-
-            textBox5.Text = changex.ToString();
-            textBox6.Text = changey.ToString();
-
-            sensibility = float.Parse(textBox7.Text);
-
-            textBox8.Text = String.Format("{0:00000.0000000}", (t.frequency / 1000.0F));
-        }
-
-
-        Thread threadC;
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //t = new PlainTickGenerator();
-            Experiment experiment = new Experiment();
-            experiment.datadirectory = "C:\\Users\\User\\Desktop\\RobotMindController\\";
-
-            t = new EEGDataTickGenerator(experiment,textBox1.Text);
-
-            t.SetStopTimer(4);
-
-            t.StartEvent();
-            t.Start(this);
-
-
-
-            ThreadStart threadStartC = delegate() {
-                int recv;
-                byte[] data = new byte[1024];
-                IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
-
-                Socket newsock = new Socket(AddressFamily.InterNetwork,
-                                SocketType.Dgram, ProtocolType.Udp);
-
-                newsock.Bind(ipep);
-                Console.WriteLine("Waiting for a client...");
-
-                IPEndPoint sendr = new IPEndPoint(IPAddress.Any, 0);
-                EndPoint Remote = (EndPoint)(sendr);
-
-                while (true)
-                {
-                    recv = newsock.ReceiveFrom(data, ref Remote);
-
-                    string message = Encoding.ASCII.GetString(data, 0, recv);
-
-                    Console.WriteLine("Message received from {0}:", Remote.ToString());
-                    Console.WriteLine(message);
-
-                    t.StartEvent(message);
-
-                }
-
-                Console.WriteLine("Finishing event thread....");
-            
-            };
-
-            threadC = new Thread(threadStartC);
-
-            threadC.Start();
-
-
-
-
-        }
         private void buttdon1_Click(object sender, EventArgs e)
         {
             //t = new PlainTickGenerator();
-            t = new EEGDataTickGenerator(textBox1.Text);
+            eegtickgen = new EEGDataTickGenerator(textBox1.Text);
 
-            t.experiment.datadirectory = "C:\\Users\\User\\Desktop\\RobotMindController\\";
+            eegtickgen.experiment.datadirectory = "C:\\Users\\User\\Desktop\\RobotMindController\\";
 
-            t.SetStopTimer(4);
+            eegtickgen.SetStopTimer(4);
 
 
             //to activate an application
@@ -626,12 +663,88 @@ namespace MindRobotController
             }
 
 
-            t.StartEvent();
-            t.Start(this);
+            eegtickgen.StartEvent();
+            eegtickgen.Start(this);
+        }
+
+        #endregion
+
+
+        public delegate void Blink();
+
+        /**
+         * This Method is the only that gets executed and updated all the info in the UI.
+         * 
+         **/ 
+        public void blink()
+        {
+            textBox2.Text = avgx.ToString();
+            textBox3.Text = avgy.ToString();
+            
+            textBox2.Text = speed.ToString();
+            textBox3.Text = balance.ToString();
+
+            textBox9.Text = threshold[0].T.ToString();
+
+            textBox4.Text = samples.ToString();
+
+            //psdO1.Text = eegtickgen.o1.ToString(); //  (GetPSD(0, 16, 32) / ((32 - 16))).ToString();
+            //psdO2.Text = eegtickgen.o2.ToString(); //  (GetPSD(1, 16, 32) / ((32 - 16))).ToString();
+
+            psdO1.Text = GetPSD(fft[0], 30, 34).ToString();
+            psdO2.Text = GetPSD(fft[1], 30, 34).ToString();
+
+            textBox5.Text = changex.ToString();
+            textBox6.Text = changey.ToString();
+
+            sensibility = float.Parse(textBox7.Text);
+
+            textBox8.Text = String.Format("{0:00000.0000000}", (eegtickgen.frequency / 1000.0F));
         }
 
 
+        Thread threadC;
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SignalStart();
+
+            /**ThreadStart threadStartC = delegate() {
+                int recv;
+                byte[] data = new byte[1024];
+                IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
+
+                Socket newsock = new Socket(AddressFamily.InterNetwork,
+                                SocketType.Dgram, ProtocolType.Udp);
+
+                newsock.Bind(ipep);
+                Console.WriteLine("Waiting for a client...");
+
+                IPEndPoint sendr = new IPEndPoint(IPAddress.Any, 0);
+                EndPoint Remote = (EndPoint)(sendr);
+                
+                while (true)
+                {
+                    recv = newsock.ReceiveFrom(data, ref Remote);
+
+                    string message = Encoding.ASCII.GetString(data, 0, recv);
+
+                    Console.WriteLine("Message received from {0}:", Remote.ToString());
+                    Console.WriteLine(message);
+
+                    eegtickgen.StartEvent(message);
+
+                }
+
+                Console.WriteLine("Finishing event thread....");
+            
+            };
+
+            threadC = new Thread(threadStartC);
+
+            threadC.Start();**/
+
+        }
 
         [Flags]
         public enum MouseEventFlags
@@ -699,6 +812,15 @@ namespace MindRobotController
             }
         }
 
+        #region Windows Functions to Control the Cursor
+        [DllImportAttribute("User32.dll")]
+
+        private static extern int FindWindow(String ClassName, String
+        WindowName);
+
+        [DllImportAttribute("User32.dll")]
+        private static extern int SetForegroundWindow(int hWnd);
+
         /// <summary>
         /// Retrieves the cursor's position, in screen coordinates.
         /// </summary>
@@ -715,6 +837,7 @@ namespace MindRobotController
 
             return lpPoint;
         }
+        #endregion
 
 
         private void Form1_Load(object sender, EventArgs e)
@@ -754,14 +877,18 @@ namespace MindRobotController
 
         private void button3_Click(object sender, EventArgs e)
         {
+            SendCommand("{ \"status\":\"L\", \"speed\": " + 0 + ", \"balance\":" + 0 + "}");
             SendPlot("finishplot");
-            t.Stop();
-            Console.WriteLine("Closing epuck port....");
-            PortController.Command("S");
-            PortController.Command("t,0");
-            PortController.Command("b,0");
-            PortController.Command("f,0");
-            PortController.Terminate();
+
+            eegtickgen.Stop();
+
+            Console.WriteLine("Shutting down everything...");
+
+            portcontroller.Stop();
+
+            portcontroller.Noise();
+
+            portcontroller.Terminate();
 
             
         }
@@ -792,6 +919,71 @@ namespace MindRobotController
                 SetCursorPos(683 + (changex), 384 + changey);
             }
         }
+
+        private void label9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox9_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        DroneController droneController = new DroneController();
+
+
+
+        private void btnEmergency_Click(object sender, EventArgs e)
+        {
+            droneController.SendEmergency();
+        }
+
+        private String FormatNumber<T>(T value)
+        {
+            return String.Format(new System.Globalization.CultureInfo("en-GB"), "{0:0.0000000}", value);
+        }
+
+        private int linealdynamicrange(int value, int Lmin, int Lmax, int min, int max)
+        {
+            float gvalue = value;
+
+            if (!(min < Lmin && Lmin < min && min < Lmax && Lmax < max))
+            {
+                gvalue = (((float)max - (float)min) / ((float)Lmax - (float)Lmin)) * ((float)value - (float)Lmax) + (float)max;
+
+            }
+
+            return (int)gvalue;
+        }
+
+
+
+        private int rescale(int value, int min, int max)
+        {
+            int newvalue = value;
+
+            if (value > max) { newvalue = max; }
+            if (value < -max) { newvalue = -max; }
+
+            return newvalue;
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+
+            if (trackBar1.Value == 1)
+            {
+                portcontroller.enabled = true;
+            }
+            else portcontroller.enabled = false;
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            calibrating = (trackBar2.Value==0);
+        }
+
 
     }
 }

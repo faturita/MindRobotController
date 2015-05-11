@@ -5,6 +5,14 @@ using System.IO;
 using System.Threading;
 using System.Reflection;
 
+/**
+ * EEGLogger
+ * 
+ * This class receives EEG data values which comes from DotNetEmotivSDK.  You can specify which value do you want and retrieve it as long as they are available.
+ * Additionally, it provides a fixed timer where you can hook up, and receive all the information that you need.
+ * 
+ * 
+ ***/
 namespace EEGLogger
 {
     public enum EE_DataChannel_t

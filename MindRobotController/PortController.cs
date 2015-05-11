@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EEGLogger
+namespace MindRobotController
 {
     using System;
     using System.IO.Ports;
@@ -11,20 +11,23 @@ namespace EEGLogger
 
     public class PortController
     {
-        static bool _continue;
-        static SerialPort _serialPort;
-        static Thread readThread = new Thread(Read);
+        bool _continue;
+        SerialPort _serialPort;
+        Thread readThread;
 
-        static public bool enabled = true;
+        public bool enabled = true;
 
 
-        public static void Init()
+        public void Init() 
         {
             // Create a new SerialPort object with default settings.
             _serialPort = new SerialPort();
 
+            // REad thread!
+             readThread = new Thread(Read);
+
             // Allow the user to set the appropriate properties.
-            _serialPort.PortName = "COM10";
+            _serialPort.PortName = "COM23";
             _serialPort.BaudRate = 115200;
 
             //_serialPort.Parity = SetPortParity(_serialPort.Parity);
@@ -44,11 +47,37 @@ namespace EEGLogger
             }
 
             Console.WriteLine("Type QUIT to exit");
-
         }
 
 
-        public static void Command(string message)
+        public void Beep()
+        {
+            Command("T,1");
+
+            Command("T,1");
+        }
+
+        public void Stop()
+        {
+            Command("S");
+        }
+
+        public void SetWheels(int wheelleft, int wheelright)
+        {
+            Command("D," + wheelleft + "," + wheelright);
+        }
+
+        public void Noise()
+        {
+            Command("t,0");
+            Command("b,0");
+            Command("f,0");
+            Command("b,1");
+            Command("T,5");
+            Command("f,0");
+        }
+
+        public void Command(string message)
         {
             StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
 
@@ -67,14 +96,16 @@ namespace EEGLogger
         }
 
 
-        private static void SendMessage(string message)
+        private void SendMessage(string message)
         {
             if (enabled)
                 _serialPort.WriteLine(message);
         }
 
-        public static void Terminate()
+        public void Terminate()
         {
+            Console.WriteLine("Closing epuck port....");
+
             if (enabled)
             {
                 readThread.Join();
@@ -84,7 +115,7 @@ namespace EEGLogger
 
 
 
-        public static void Madin()
+        public void Madin()
         {
             string name;
             string message;
@@ -136,7 +167,11 @@ namespace EEGLogger
             _serialPort.Close();
         }
 
-        public static void Read()
+        /**
+         * Read Thread Function
+         * 
+         ***/ 
+        public void Read()
         {
             while (_continue)
             {
@@ -145,10 +180,13 @@ namespace EEGLogger
                     string message = _serialPort.ReadLine();
                     //Console.WriteLine(message);
                 }
-                catch (TimeoutException) { }
+                catch (TimeoutException) {
+                    _continue = false;
+                }
             }
         }
 
+        #region Console Commands 
         // Display Port values and prompt user to enter a port. 
         public static string SetPortName(string defaultPortName)
         {
@@ -206,6 +244,7 @@ namespace EEGLogger
 
             return (Parity)Enum.Parse(typeof(Parity), parity, true);
         }
+
         // Display DataBits values and prompt user to enter a value. 
         public static int SetPortDataBits(int defaultPortDataBits)
         {
@@ -264,5 +303,8 @@ namespace EEGLogger
 
             return (Handshake)Enum.Parse(typeof(Handshake), handshake, true);
         }
+
+        #endregion
+
     }
 }
