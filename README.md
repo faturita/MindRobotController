@@ -4,6 +4,16 @@
 
 ## Features
 
-* Basic gyroscopes sensors.
+* General Control UI.
+* Basic gyroscopes sensors.  They has been tested against the epuck and ArDrone Parrot.
+* Electrode power visualization.
 * Thresholding and DSP capabilities.
 * Ability to send EEG windowed signals to Matlab for further processing.
+
+## Requirements
+
+* Emotiv Research SDK.  
+
+## ToDO
+
+* Use Emokit

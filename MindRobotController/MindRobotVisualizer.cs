@@ -80,6 +80,7 @@ namespace MindRobotController
             experiment.datadirectory = "C:\\Users\\User\\Desktop\\RobotMindController\\";
 
             eegtickgen = new EEGDataTickGenerator(experiment, textBox1.Text);
+            //eegtickgen = new RandomTickGenerator();
 
             eegtickgen.SetStopTimer(4);
 
@@ -171,6 +172,9 @@ namespace MindRobotController
             }
         }
 
+        int signx = 0;
+        int signy = 0;
+
         #region Controllers
         private void ControlDrone()
         {
@@ -194,6 +198,20 @@ namespace MindRobotController
             refractory++;
 
             doFFT();
+
+            /**
+            if (((Math.Abs(changex) > 100 || Math.Abs(changey) > 40)))  // 100,40
+            {
+                SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(rescale(changey, -800, 800) * 0.7F / 800.0F) + ", \"balance\":" + FormatNumber(linealdynamicrange(changex, minBalance, maxBalance, -800, 800) * 0.7F / 800.0F) + "}");
+            } 
+            else
+            {
+                portcontroller.Stop();
+
+                //if (samples % 128 ==0) SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+                
+                balance = speed = 0;
+            }**/
 
             if (((Math.Abs(changex) > 100 || Math.Abs(changey) > 40)))  // 100,40
             {
@@ -226,19 +244,37 @@ namespace MindRobotController
 
                 //Console.WriteLine("[" + minBalance + "," + maxBalance + "]");
 
-                speed = linealdynamicrange(speed, minSpeed, maxSpeed, -max, max);
-                balance = linealdynamicrange(balance, minBalance, maxBalance, -max, max);
+                int nspeed = linealdynamicrange(speed, minSpeed, maxSpeed, -max, max);
+                int nbalance = linealdynamicrange(balance, minBalance, maxBalance, -max, max);
 
                 // Just be sure that no value goes beyond the threshold.
-                speed = rescale(speed, -max, max);
-                balance = rescale(balance, -max, max);
+                nspeed = rescale(nspeed, -max, max);
+                nbalance = rescale(nbalance, -max, max);
 
                 float MAXVALUE = 0.7F;
 
-                double fspeed = speed * MAXVALUE / max;
-                double fbalance = balance * MAXVALUE / max;
+                double fspeed = nspeed * MAXVALUE / max;
+                double fbalance = nbalance * MAXVALUE / max;
 
-                SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(fspeed) + ", \"balance\":" + FormatNumber(fbalance) + "}");
+
+                // With parrot, this works very well.
+                if (signx != Math.Sign(balance) && Math.Abs(changex) > 100 )
+                {
+                    fspeed = 0.0;
+                    fbalance = (Math.Sign(balance) * 0.1);
+                    SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(fspeed) + ", \"balance\":" + FormatNumber(fbalance) + "}");
+
+                    signx = Math.Sign(balance);
+                }
+
+                if (signy != Math.Sign(speed) && Math.Abs(changey) > 40)
+                {
+                    fspeed = (Math.Sign(speed) * -0.1);
+                    fbalance = 0.0;
+                    SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(fspeed) + ", \"balance\":" + FormatNumber(fbalance) + "}");
+
+                    signy = Math.Sign(speed);
+                }
 
                 //doSomeNoise();
 
@@ -265,6 +301,8 @@ namespace MindRobotController
 
         bool dofire = true;
 
+        bool flying = false;
+
         private void doFFT()
         {
             fs[0][samples % WINDOWSIZE] = eegtickgen.o1;
@@ -287,13 +325,23 @@ namespace MindRobotController
                     if (dofire && threshold[c].votebellow(GetPSD(fft[c], 30, 34)))
                     {
                         dofire = false;
-                        Console.WriteLine("Vote!!!!!");
+                        flying = true;
+                        Console.WriteLine("FIRED!");
                         SendCommand("{ \"status\":\"T\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
-                    } 
+                    }
+
+                    /**if (flying && threshold[c].voteabove(GetPSD(fft[c], 30, 34)))
+                    {
+                        dofire = false;
+                        flying = false;
+                        Console.WriteLine("LAND!!!");
+                        SendCommand("{ \"status\":\"L\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+                    }**/
+
 
                     // USAME Para mandar esto a Matlab
                     //SendFFT2(s, 2);
-                    //SendFFT2(fft[0], WINDOWSIZE/2);
+                    SendFFT2(fft[0], WINDOWSIZE/2);
                 }
             }
         }
@@ -685,14 +733,21 @@ namespace MindRobotController
             textBox3.Text = balance.ToString();
 
             textBox9.Text = threshold[0].T.ToString();
+            textBox10.Text = threshold[1].T.ToString();
 
             textBox4.Text = samples.ToString();
 
             //psdO1.Text = eegtickgen.o1.ToString(); //  (GetPSD(0, 16, 32) / ((32 - 16))).ToString();
             //psdO2.Text = eegtickgen.o2.ToString(); //  (GetPSD(1, 16, 32) / ((32 - 16))).ToString();
 
+            textBox11.BackColor = Color.FromArgb(rescale((int)(GetPSD(fft[0], 30, 34) * 255.0D / 10000D),0,255), 0, 0);
+            textBox12.BackColor = Color.FromArgb(rescale((int)(GetPSD(fft[1], 30, 34) * 255.0D / 10000D),0,255), 0, 0);
+
+            
+
             psdO1.Text = GetPSD(fft[0], 30, 34).ToString();
             psdO2.Text = GetPSD(fft[1], 30, 34).ToString();
+
 
             textBox5.Text = changex.ToString();
             textBox6.Text = changey.ToString();
@@ -982,6 +1037,46 @@ namespace MindRobotController
         private void trackBar2_Scroll(object sender, EventArgs e)
         {
             calibrating = (trackBar2.Value==0);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(0.0F) + ", \"balance\":" + FormatNumber(-0.1F) + "}");
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(0.0F) + ", \"balance\":" + FormatNumber(0.1F) + "}");
+        }
+
+        private void button2_Click_2(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(0.1F) + ", \"balance\":" + FormatNumber(0.0F) + "}");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(-0.1F) + ", \"balance\":" + FormatNumber(0.0F) + "}");
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"A\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"T\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            SendCommand("{ \"status\":\"L\", \"speed\": " + FormatNumber(0) + ", \"balance\":" + FormatNumber(0) + "}");
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
         }
 
 

@@ -123,7 +123,7 @@ namespace MindRobotController
         
 
 
-        static void Mfain(string[] args)
+        static void Madin(string[] args)
         {
             Threshold t = new Threshold();
 
@@ -139,24 +139,21 @@ namespace MindRobotController
 
             Random r = new Random();
 
-            for (int i = 0; i < 30; i++)
-            {
-                if (t.votebellow(3000.0))
-                {
-                    Console.WriteLine(".");
-                }
-            }
+            for(int i=0;i<2;i++)
+                Console.WriteLine(t.votebellow(2300.0));
 
-            for (int i = 0; i < 70; i++)
-            {
-                if (t.votebellow(2500.0))
-                {
-                    Console.WriteLine(".");
-                }
-            }
+            for (int i = 0; i < 2; i++)
+                Console.WriteLine(t.votebellow(2700.0));
 
-            Console.WriteLine(t.votebellow(2300.0));
+            for (int i = 0; i < 2; i++)
+                Console.WriteLine(t.votebellow(2200.0));
 
+
+            Console.WriteLine(t.voteabove(9800.0));
+
+            Console.WriteLine(t.voteabove(9800.0));
+
+            Console.WriteLine(t.voteabove(9800.0));
 
         }
 

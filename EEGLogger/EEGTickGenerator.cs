@@ -31,6 +31,28 @@ namespace EEGLogger
         void StartEvent();// This should be part of a different interface
     }
 
+
+    public class RandomTickGenerator : EEGDataTickGenerator
+    {
+        public RandomTickGenerator() :  base("random")
+        {
+        }
+
+        public override void Run()
+        {
+            while (!stopped)
+            {
+                Random r = new Random();
+
+                o1 = r.Next(3);
+                o2 = r.Next(3);
+
+                gyrox = 0;
+                gyroy = 0;
+            }
+        }
+    }
+
     /**
      * Abstract Tick Generator.
      * 
@@ -39,7 +61,7 @@ namespace EEGLogger
      ***/
     public abstract class BaseTickGenerator : TickGenerator
     {
-        protected Boolean stopped;
+        public Boolean stopped;
 
         Thread threadA;
 
